@@ -57,7 +57,9 @@ def relu(x: float) -> float:
     """Rectified linear unit (ReLU) function."""
     return x if x > 0 else 0.0
 
+
 EPS = 1e-6
+
 
 def log(x: float) -> float:
     """Natural logarithm function."""
@@ -81,7 +83,7 @@ def inv(x: float) -> float:
 
 def inv_back(x: float, y: float) -> float:
     """Derivative of inverse function multiplied by a second argument."""
-    return -(1.0 / x ** 2) * y
+    return -(1.0 / x**2) * y
 
 
 def relu_back(x: float, y: float) -> float:
@@ -91,6 +93,7 @@ def relu_back(x: float, y: float) -> float:
 
 def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[float]]:
     """Apply a function to each element in a list."""
+
     def _map(ls: Iterable[float]) -> Iterable[float]:
         ret = []
         for x in ls:
@@ -101,26 +104,30 @@ def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[fl
 
 
 def zipWith(
-    fn: Callable[[float, float], float],) -> Callable[[Iterable[float], Iterable[float]], Iterable[float]]:
+    fn: Callable[[float, float], float],
+) -> Callable[[Iterable[float], Iterable[float]], Iterable[float]]:
     """Apply a function to pairs of elements combined from two lists."""
+
     def _zipWith(ls1: Iterable[float], ls2: Iterable[float]) -> Iterable[float]:
         ret = []
         for x, y in zip(ls1, ls2):
             ret.append(fn(x, y))
         return ret
-    
+
     return _zipWith
 
 
 def reduce(
-    fn: Callable[[float, float], float], initial: float) -> Callable[[Iterable[float]], float]:
+    fn: Callable[[float, float], float], initial: float
+) -> Callable[[Iterable[float]], float]:
     """Reduce an iterable to a single value using a function."""
+
     def _reduce(ls: Iterable[float]) -> float:
         ret = initial
         for x in ls:
             ret = fn(ret, x)
         return ret
-    
+
     return _reduce
 
 

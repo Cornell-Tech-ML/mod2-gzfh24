@@ -52,11 +52,11 @@ class Module:
         parameters = {}
         for k, v in self._parameters.items():
             parameters[k] = v
-        
+
         for mod_name, m in self._modules.items():
             for k, v in m.named_parameters():
                 parameters[f"{mod_name}.{k}"] = v
-        
+
         return list(parameters.items())
 
     def parameters(self) -> Sequence[Parameter]:

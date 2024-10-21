@@ -12,6 +12,35 @@ def RParam(*shape):
     return minitorch.Parameter(r)
 
 # TODO: Implement for Task 2.5.
+class Linear(minitorch.Module):
+    def __init__(self, in_size, out_size):
+        super().__init__()
+        self.weights = RParam(in_size, out_size)
+        self.bias = RParam(out_size)
+
+    def forward(self, x):
+
+        x_expanded = x.view(*x.shape, 1)
+        weights_expanded = self.weights.value.view(1, self.weights.value.shape[0], self.weights.value.shape[1])
+        xw = x_expanded * weights_expanded
+        y = xw.sum(len(x.shape))
+        y = y + self.bias.value
+
+
+        return y
+
+class Network(minitorch.Module):
+    def __init__(self, hidden_layers):
+        super().__init__()
+        self.layer1 = Linear(2, hidden_layers)
+        self.layer2 = Linear(hidden_layers, hidden_layers)
+        self.layer3 = Linear(hidden_layers, 1)
+
+    def forward(self, x):
+        x = self.layer1.forward(x).relu()
+        x = self.layer2.forward(x).relu()
+        x = self.layer3.forward(x).sigmoid()
+        return x
 
 def default_log_fn(epoch, total_loss, correct, losses):
     print("Epoch ", epoch, " loss ", total_loss, "correct", correct)

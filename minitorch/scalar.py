@@ -181,7 +181,6 @@ class Scalar:
         return EQ.apply(b, self)
 
 
-
 def derivative_check(f: Any, *scalars: Scalar) -> None:
     """Checks that autodiff works on a python function.
     Asserts False if derivative is incorrect.
