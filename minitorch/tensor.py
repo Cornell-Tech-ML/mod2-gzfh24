@@ -30,6 +30,7 @@ from .tensor_functions import (
     Sigmoid,
     Sum,
     View,
+    tensor,
 )
 
 if TYPE_CHECKING:
@@ -394,13 +395,8 @@ class Tensor:
 
     def view(self, *shape: int) -> Tensor:
         """Reshape the tensor to the specified shape."""
-        shape_tensors = tuple(self._ensure_tensor(i) for i in shape)
-        shape_tensor = Tensor.make(
-            [int(i.item()) for i in shape_tensors],
-            (len(shape_tensors),),
-            backend=self.backend,
-        )
-        return View.apply(self.contiguous(), shape_tensor)
+        shape_list = [float(s) for s in shape]
+        return View.apply(self.contiguous(), tensor(shape_list))
 
     def zero_grad_(self) -> None:
         """Zero out the gradients for the parameters."""

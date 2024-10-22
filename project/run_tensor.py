@@ -20,14 +20,13 @@ class Linear(minitorch.Module):
 
     def forward(self, x):
 
-        x_expanded = x.view(*x.shape, 1)
+        input_expanded = x.view(x.shape[0], 1, x.shape[1])
         weights_expanded = self.weights.value.view(1, self.weights.value.shape[0], self.weights.value.shape[1])
-        xw = x_expanded * weights_expanded
-        y = xw.sum(len(x.shape))
-        y = y + self.bias.value
 
+        output = (input_expanded * weights_expanded).sum(2)
+        output = output.view(output.shape[0], output.shape[1])
 
-        return y
+        return output + self.bias.value
 
 class Network(minitorch.Module):
     def __init__(self, hidden_layers):
