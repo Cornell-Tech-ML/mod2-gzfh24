@@ -93,26 +93,15 @@ def broadcast_index(
         None
 
     """
-    ndim_big = big_shape.size
-    ndim_small = shape.size
+    offset = len(big_shape) - len(shape)
 
-    pad = ndim_big - ndim_small
+    for i in range(len(shape)):
+        big_dim_index = i + offset
 
-    if pad < 0:
-        raise ValueError("The big_shape must have equal or more dimensions than shape.")
-
-    for j in range(ndim_small):
-        shape_dim = shape[j]
-        big_dim = big_index[j + pad]
-
-        if shape_dim == 1:
-            out_index[j] = 0
+        if shape[i] == 1:
+            out_index[i] = 0
         else:
-            if big_dim >= shape_dim:
-                raise IndexError(
-                    f"Index {big_dim} out of bounds for dimension {j} with size {shape_dim}"
-                )
-            out_index[j] = big_dim
+            out_index[i] = big_index[big_dim_index]
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -132,28 +121,26 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
 
     """
-    reversed_shape1 = shape1[::-1]
-    reversed_shape2 = shape2[::-1]
+    max_len = max(len(shape1), len(shape2))
+    offset1 = max_len - len(shape1)
+    offset2 = max_len - len(shape2)
 
-    max_len = max(len(reversed_shape1), len(reversed_shape2))
+    padded_shape1 = (1,) * offset1 + tuple(shape1)
+    padded_shape2 = (1,) * offset2 + tuple(shape2)
 
-    broadcasted_reversed_shape = []
+    broadcasted_shape = []
 
-    for i in range(max_len):
-        dim1 = reversed_shape1[i] if i < len(reversed_shape1) else 1
-        dim2 = reversed_shape2[i] if i < len(reversed_shape2) else 1
-
-        if dim1 == dim2 or dim1 == 1 or dim2 == 1:
-            broadcasted_dim = max(dim1, dim2)
-            broadcasted_reversed_shape.append(broadcasted_dim)
+    for dim1, dim2 in zip(padded_shape1, padded_shape2):
+        if dim1 == 1:
+            broadcasted_shape.append(dim2)
+        elif dim2 == 1:
+            broadcasted_shape.append(dim1)
+        elif dim1 == dim2:
+            broadcasted_shape.append(dim1)
         else:
-            raise IndexingError(
-                f"Cannot broadcast dimensions at position {-i-1}: {dim1} vs {dim2}"
-            )
+            raise IndexingError(f"Cannot broadcast dimensions {dim1} and {dim2}")
 
-    broadcasted_shape = tuple(broadcasted_reversed_shape[::-1])
-
-    return broadcasted_shape
+    return tuple(broadcasted_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
